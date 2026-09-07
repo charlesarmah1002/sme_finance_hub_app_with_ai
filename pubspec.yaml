@@ -1,6 +1,6 @@
 name: sme_cashflow
 
-description: SME Cashflow application.
+description: SME Finance Hub application.
 publish_to: 'none'
 version: 0.1.0+1
 
@@ -23,3 +23,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/branding/logo.png

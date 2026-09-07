@@ -68,12 +68,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     if (!formKey.currentState!.validate()) return;
-    await context.read<AuthProvider>().register(
-          businessName: businessController.text.trim(),
-          name: nameController.text.trim(),
-          email: emailController.text.trim(),
-          password: passwordController.text,
-        );
+    final registered = await context.read<AuthProvider>().register(
+      businessName: businessController.text.trim(),
+      name: nameController.text.trim(),
+      email: emailController.text.trim(),
+      password: passwordController.text,
+    );
+    if (registered && mounted) Navigator.of(context).pop();
   }
 
   String? _required(String? value) => value == null || value.trim().isEmpty ? 'This field is required' : null;

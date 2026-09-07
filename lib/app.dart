@@ -19,7 +19,7 @@ class CashflowApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SME Cashflow',
+      title: 'SME Finance Hub',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF126B5B)),
