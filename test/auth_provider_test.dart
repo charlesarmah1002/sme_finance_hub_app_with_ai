@@ -100,7 +100,6 @@ void main() {
     expect(result, isFalse);
     expect(auth.status, AuthStatus.unauthenticated);
   });
-
 }
 
 const _tokens = {
