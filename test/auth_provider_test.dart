@@ -20,7 +20,8 @@ void main() {
         final body = await utf8.decoder.bind(request).join();
         final data = jsonDecode(body) as Map<String, dynamic>;
         if (path.endsWith('login/') && data['email'] == 'wrong@example.com') {
-          _writeJson(request.response, HttpStatus.unauthorized, {'detail': 'Invalid credentials'});
+          _writeJson(request.response, HttpStatus.unauthorized,
+              {'detail': 'Invalid credentials'});
           return;
         }
         _writeJson(request.response, HttpStatus.ok, _tokens);
@@ -28,11 +29,14 @@ void main() {
       }
       if (path == '/api/auth/me/') {
         meCalls++;
-        final authorization = request.headers.value(HttpHeaders.authorizationHeader);
+        final authorization =
+            request.headers.value(HttpHeaders.authorizationHeader);
         if (authorization == 'Bearer expired') {
-          _writeJson(request.response, HttpStatus.unauthorized, {'detail': 'Expired'});
+          _writeJson(
+              request.response, HttpStatus.unauthorized, {'detail': 'Expired'});
         } else {
-          _writeJson(request.response, HttpStatus.ok, {'id': 1, 'email': 'owner@example.com'});
+          _writeJson(request.response, HttpStatus.ok,
+              {'id': 1, 'email': 'owner@example.com'});
         }
         return;
       }
@@ -40,7 +44,8 @@ void main() {
         _writeJson(request.response, HttpStatus.ok, {'access': 'fresh-access'});
         return;
       }
-      _writeJson(request.response, HttpStatus.unauthorized, {'detail': 'Invalid credentials'});
+      _writeJson(request.response, HttpStatus.unauthorized,
+          {'detail': 'Invalid credentials'});
     });
   });
 
@@ -49,7 +54,8 @@ void main() {
   test('login stores tokens and logout clears them', () async {
     final auth = AuthProvider(_service(server.port));
 
-    expect(await auth.login(email: 'owner@example.com', password: 'password'), isTrue);
+    expect(await auth.login(email: 'owner@example.com', password: 'password'),
+        isTrue);
     expect(auth.status, AuthStatus.authenticated);
     expect(await auth.apiService.getAccessToken(), 'access-token');
 
@@ -74,7 +80,8 @@ void main() {
   });
 
   test('startup restores an expired access token through refresh', () async {
-    SharedPreferences.setMockInitialValues({'access_token': 'expired', 'refresh_token': 'refresh-token'});
+    SharedPreferences.setMockInitialValues(
+        {'access_token': 'expired', 'refresh_token': 'refresh-token'});
     final auth = AuthProvider(_service(server.port));
 
     await auth.initialize();
@@ -87,7 +94,8 @@ void main() {
   test('invalid credentials leave the user unauthenticated', () async {
     final auth = AuthProvider(_service(server.port));
 
-    final result = await auth.login(email: 'wrong@example.com', password: 'wrong');
+    final result =
+        await auth.login(email: 'wrong@example.com', password: 'wrong');
 
     expect(result, isFalse);
     expect(auth.status, AuthStatus.unauthenticated);
@@ -100,7 +108,8 @@ const _tokens = {
   'user': {'id': 1, 'email': 'owner@example.com'},
 };
 
-ApiService _service(int port) => ApiService(baseUrl: 'http://127.0.0.1:$port/api');
+ApiService _service(int port) =>
+    ApiService(baseUrl: 'http://127.0.0.1:$port/api');
 
 void _writeJson(HttpResponse response, int statusCode, Object body) {
   response

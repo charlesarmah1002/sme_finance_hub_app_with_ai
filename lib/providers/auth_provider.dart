@@ -39,7 +39,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> login({required String email, required String password}) async {
-    return _authenticate(() => apiService.login(email: email, password: password));
+    return _authenticate(
+        () => apiService.login(email: email, password: password));
   }
 
   Future<bool> register({
@@ -84,9 +85,11 @@ class AuthProvider extends ChangeNotifier {
       final accessToken = data['access'] as String?;
       final refreshToken = data['refresh'] as String?;
       if (accessToken == null || refreshToken == null) {
-        throw const ApiException(message: 'The API response did not contain login tokens.');
+        throw const ApiException(
+            message: 'The API response did not contain login tokens.');
       }
-      await apiService.saveTokens(accessToken: accessToken, refreshToken: refreshToken);
+      await apiService.saveTokens(
+          accessToken: accessToken, refreshToken: refreshToken);
       currentUser = _asMap(data['user']);
       status = AuthStatus.authenticated;
       notifyListeners();

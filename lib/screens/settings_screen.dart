@@ -10,7 +10,6 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final user = auth.currentUser ?? const <String, dynamic>{};
-    final businessName = _businessName(user);
 
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -20,9 +19,9 @@ class SettingsScreen extends StatelessWidget {
         Card(
           child: Column(
             children: [
-              _InfoTile(label: 'Name', value: _value(user['name'])),
-              _InfoTile(label: 'Email', value: _value(user['email'])),
-              _InfoTile(label: 'Business name', value: businessName),
+              _InfoTile(label: 'Name', value: _profileValue(user, 'name')),
+              _InfoTile(label: 'Email', value: _profileValue(user, 'email')),
+              _InfoTile(label: 'Business name', value: _businessName(user)),
             ],
           ),
         ),
@@ -37,10 +36,37 @@ class SettingsScreen extends StatelessWidget {
   }
 
   String _businessName(Map<String, dynamic> user) {
-    final direct = user['business_name'] ?? user['businessName'];
-    if (direct != null) return direct.toString();
+    final direct =
+        _profileValue(user, 'business_name', alternateKey: 'businessName');
+    if (direct != 'Not provided') return direct;
     final business = user['business'];
-    if (business is Map<String, dynamic>) return _value(business['name']);
+    if (business is Map<String, dynamic>) {
+      return _value(business['name']);
+    }
+    final nestedUser = user['user'];
+    if (nestedUser is Map<String, dynamic>) {
+      final nestedBusiness = nestedUser['business'];
+      if (nestedBusiness is Map<String, dynamic>) {
+        return _value(nestedBusiness['name']);
+      }
+    }
+    return 'Not provided';
+  }
+
+  String _profileValue(Map<String, dynamic> user, String key,
+      {String? alternateKey}) {
+    final values = [
+      user[key],
+      if (alternateKey != null) user[alternateKey],
+      if (user['user'] is Map<String, dynamic>)
+        (user['user'] as Map<String, dynamic>)[key],
+      if (alternateKey != null && user['user'] is Map<String, dynamic>)
+        (user['user'] as Map<String, dynamic>)[alternateKey],
+    ];
+    for (final value in values) {
+      final text = value?.toString().trim() ?? '';
+      if (text.isNotEmpty) return text;
+    }
     return 'Not provided';
   }
 
