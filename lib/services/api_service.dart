@@ -32,7 +32,8 @@ class ApiService {
   static const accessTokenKey = 'access_token';
   static const refreshTokenKey = 'refresh_token';
 
-  Future<Response<T>> get<T>(String path, {Map<String, dynamic>? queryParameters}) {
+  Future<Response<T>> get<T>(String path,
+      {Map<String, dynamic>? queryParameters}) {
     return _send(() => _dio.get<T>(path, queryParameters: queryParameters));
   }
 
@@ -54,12 +55,15 @@ class ApiService {
 
   Future<Response<T>> getApiRoot<T>() => get<T>('');
 
-  Future<Response<Map<String, dynamic>>> register({required Map<String, dynamic> data}) {
+  Future<Response<Map<String, dynamic>>> register(
+      {required Map<String, dynamic> data}) {
     return post<Map<String, dynamic>>('auth/register/', data: data);
   }
 
-  Future<Response<Map<String, dynamic>>> login({required String email, required String password}) {
-    return post<Map<String, dynamic>>('auth/login/', data: {'email': email, 'password': password});
+  Future<Response<Map<String, dynamic>>> login(
+      {required String email, required String password}) {
+    return post<Map<String, dynamic>>('auth/login/',
+        data: {'email': email, 'password': password});
   }
 
   Future<Response<Map<String, dynamic>>> me() {
@@ -72,15 +76,18 @@ class ApiService {
 
   Future<Response<dynamic>> accounts() => get<dynamic>('accounts/');
 
-  Future<Response<Map<String, dynamic>>> createAccount(Map<String, dynamic> data) {
+  Future<Response<Map<String, dynamic>>> createAccount(
+      Map<String, dynamic> data) {
     return post<Map<String, dynamic>>('accounts/', data: data);
   }
 
-  Future<Response<Map<String, dynamic>>> updateAccount(int id, Map<String, dynamic> data) {
+  Future<Response<Map<String, dynamic>>> updateAccount(
+      int id, Map<String, dynamic> data) {
     return put<Map<String, dynamic>>('accounts/$id/', data: data);
   }
 
-  Future<Response<Map<String, dynamic>>> patchAccount(int id, Map<String, dynamic> data) {
+  Future<Response<Map<String, dynamic>>> patchAccount(
+      int id, Map<String, dynamic> data) {
     return patch<Map<String, dynamic>>('accounts/$id/', data: data);
   }
 
@@ -90,11 +97,13 @@ class ApiService {
 
   Future<Response<dynamic>> categories() => get<dynamic>('categories/');
 
-  Future<Response<Map<String, dynamic>>> createCategory(Map<String, dynamic> data) {
+  Future<Response<Map<String, dynamic>>> createCategory(
+      Map<String, dynamic> data) {
     return post<Map<String, dynamic>>('categories/', data: data);
   }
 
-  Future<Response<Map<String, dynamic>>> updateCategory(int id, Map<String, dynamic> data) {
+  Future<Response<Map<String, dynamic>>> updateCategory(
+      int id, Map<String, dynamic> data) {
     return put<Map<String, dynamic>>('categories/$id/', data: data);
   }
 
@@ -102,17 +111,22 @@ class ApiService {
     await delete<void>('categories/$id/');
   }
 
-  Future<Response<dynamic>> transactions({String? type}) => get<dynamic>('transactions/', queryParameters: type == null ? null : {'type': type});
+  Future<Response<dynamic>> transactions({String? type}) =>
+      get<dynamic>('transactions/',
+          queryParameters: type == null ? null : {'type': type});
 
-  Future<Response<Map<String, dynamic>>> createTransaction(Map<String, dynamic> data) {
+  Future<Response<Map<String, dynamic>>> createTransaction(
+      Map<String, dynamic> data) {
     return post<Map<String, dynamic>>('transactions/', data: data);
   }
 
-  Future<Response<Map<String, dynamic>>> updateTransaction(int id, Map<String, dynamic> data) {
+  Future<Response<Map<String, dynamic>>> updateTransaction(
+      int id, Map<String, dynamic> data) {
     return put<Map<String, dynamic>>('transactions/$id/', data: data);
   }
 
-  Future<Response<Map<String, dynamic>>> patchTransaction(int id, Map<String, dynamic> data) {
+  Future<Response<Map<String, dynamic>>> patchTransaction(
+      int id, Map<String, dynamic> data) {
     return patch<Map<String, dynamic>>('transactions/$id/', data: data);
   }
 
@@ -120,21 +134,27 @@ class ApiService {
     await delete<void>('transactions/$id/');
   }
 
-  Future<Response<dynamic>> cashflowReport() => get<dynamic>('reports/cashflow/');
+  Future<Response<dynamic>> cashflowReport() =>
+      get<dynamic>('reports/cashflow/');
 
-  Future<Response<dynamic>> categoryReport() => get<dynamic>('reports/by-category/');
+  Future<Response<dynamic>> categoryReport() =>
+      get<dynamic>('reports/by-category/');
 
-  Future<Response<dynamic>> accountReport() => get<dynamic>('reports/by-account/');
+  Future<Response<dynamic>> accountReport() =>
+      get<dynamic>('reports/by-account/');
 
-  Future<void> saveTokens({required String accessToken, required String refreshToken}) async {
+  Future<void> saveTokens(
+      {required String accessToken, required String refreshToken}) async {
     final preferences = await _getPreferences();
     await preferences.setString(accessTokenKey, accessToken);
     await preferences.setString(refreshTokenKey, refreshToken);
   }
 
-  Future<String?> getAccessToken() async => (await _getPreferences()).getString(accessTokenKey);
+  Future<String?> getAccessToken() async =>
+      (await _getPreferences()).getString(accessTokenKey);
 
-  Future<String?> getRefreshToken() async => (await _getPreferences()).getString(refreshTokenKey);
+  Future<String?> getRefreshToken() async =>
+      (await _getPreferences()).getString(refreshTokenKey);
 
   Future<void> clearTokens() async {
     final preferences = await _getPreferences();
@@ -183,7 +203,8 @@ class _AuthInterceptor extends Interceptor {
   final ApiService service;
 
   @override
-  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
     final accessToken = await service.getAccessToken();
     if (accessToken != null && accessToken.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $accessToken';
@@ -192,9 +213,12 @@ class _AuthInterceptor extends Interceptor {
   }
 
   @override
-  Future<void> onError(DioException error, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+      DioException error, ErrorInterceptorHandler handler) async {
     final alreadyRetried = error.requestOptions.extra['authRetry'] == true;
-    if (error.response?.statusCode != 401 || alreadyRetried || error.requestOptions.path == 'auth/refresh/') {
+    if (error.response?.statusCode != 401 ||
+        alreadyRetried ||
+        error.requestOptions.path == 'auth/refresh/') {
       handler.next(error);
       return;
     }
@@ -209,7 +233,8 @@ class _AuthInterceptor extends Interceptor {
 
     final request = error.requestOptions;
     request.extra['authRetry'] = true;
-    request.headers['Authorization'] = 'Bearer ${await service.getAccessToken()}';
+    request.headers['Authorization'] =
+        'Bearer ${await service.getAccessToken()}';
     try {
       handler.resolve(await service._dio.fetch(request));
     } on DioException catch (retryError) {
@@ -226,10 +251,10 @@ class ApiException implements Exception {
     final responseData = error.response?.data;
     final detail = _errorDetail(responseData);
     final message = detail != null && detail.isNotEmpty
-      ? detail
-      : statusCode == null
-        ? 'Unable to communicate with the API.'
-        : 'API request failed with status $statusCode.';
+        ? detail
+        : statusCode == null
+            ? 'Unable to communicate with the API.'
+            : 'API request failed with status $statusCode.';
 
     return ApiException(message: message, statusCode: statusCode);
   }
@@ -237,7 +262,9 @@ class ApiException implements Exception {
   static String? _errorDetail(Object? data) {
     if (data is Map<String, dynamic>) {
       final values = data.entries.map((entry) {
-        final value = entry.value is List ? (entry.value as List).join(', ') : entry.value;
+        final value = entry.value is List
+            ? (entry.value as List).join(', ')
+            : entry.value;
         return '${entry.key}: $value';
       }).join('\n');
       return values.isEmpty ? null : values;
